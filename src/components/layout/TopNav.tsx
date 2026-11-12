@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { usePayGuard } from '../../context/PayGuardContext';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { ActiveTab, Language } from '../../types';
 import { APP_CONTAINER_CLASS } from '../../constants/layout';
 import { Modal } from '../common/Modal';
@@ -19,6 +21,7 @@ import {
   ChevronDown,
   Check,
   RotateCcw,
+  LogOut,
   X,
   Sun,
   Moon,
@@ -44,6 +47,21 @@ export const TopNav: React.FC<TopNavProps> = () => {
     setSearchQuery,
     resetDemoData,
   } = usePayGuard();
+
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const displayName = user?.fullName || 'PayGuard User';
+  const initials =
+    displayName.trim().split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'U';
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      navigate('/login', { replace: true });
+    }
+  };
 
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -88,9 +106,9 @@ export const TopNav: React.FC<TopNavProps> = () => {
   ];
 
   const languages: { code: Language; label: string; native: string; flag: string }[] = [
-    { code: 'en', label: 'English', native: 'English', flag: '🇺🇸' },
-    { code: 'hi', label: 'Hindi', native: 'हिन्दी', flag: '🇮🇳' },
-    { code: 'mr', label: 'Marathi', native: 'मराठी', flag: '🇮🇳' },
+    { code: 'en', label: 'English', native: 'English', flag: 'ðŸ‡ºðŸ‡¸' },
+    { code: 'hi', label: 'Hindi', native: 'à¤¹à¤¿à¤¨à¥à¤¦à¥€', flag: 'ðŸ‡®ðŸ‡³' },
+    { code: 'mr', label: 'Marathi', native: 'à¤®à¤°à¤¾à¤ à¥€', flag: 'ðŸ‡®ðŸ‡³' },
   ];
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -343,17 +361,15 @@ export const TopNav: React.FC<TopNavProps> = () => {
                 className="flex items-center gap-1 pl-1 pr-1.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors flex-shrink-0"
                 aria-label="User profile"
               >
-                <div className="w-7 h-7 rounded-lg bg-slate-900 dark:bg-trust-600 text-white flex items-center justify-center font-bold text-[12px] flex-shrink-0 shadow-xs">
-                  PG
-                </div>
+                <div className="w-7 h-7 rounded-lg bg-slate-900 dark:bg-trust-600 text-white flex items-center justify-center font-bold text-[12px] flex-shrink-0 shadow-xs">{initials}</div>
                 <ChevronDown className="w-3 h-3 text-slate-400" />
               </button>
 
               {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#0D1527] rounded-xl shadow-soft border border-slate-200 dark:border-slate-800 py-1.5 z-50">
                   <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800">
-                    <p className="text-[13px] font-medium text-slate-900 dark:text-white truncate">PayGuard User</p>
-                    <p className="text-[12px] text-slate-400 font-mono truncate">user@sandbox.payguard</p>
+                    <p className="text-[13px] font-medium text-slate-900 dark:text-white truncate">{displayName}</p>
+                    <p className="text-[12px] text-slate-400 font-mono truncate">{user?.email || 'No email available'}</p>
                     <div className="mt-2 text-[11px] font-mono text-slate-500 bg-slate-50 dark:bg-slate-900 px-2 py-1 rounded border border-slate-200 dark:border-slate-800">
                       Env: PayPal Sandbox REST v2
                     </div>
@@ -390,6 +406,15 @@ export const TopNav: React.FC<TopNavProps> = () => {
                       >
                         <RotateCcw className="w-3.5 h-3.5 text-coral-500" />
                         <span>Reset Sandbox Data</span>
+                      </button>
+                    </div>
+                    <div className="pt-1 mt-1 border-t border-slate-100 dark:border-slate-800">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-2.5 py-1.5 text-[13px] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-normal flex items-center gap-2 transition-colors"
+                      >
+                        <LogOut className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Logout</span>
                       </button>
                     </div>
                   </div>
@@ -510,3 +535,5 @@ export const TopNav: React.FC<TopNavProps> = () => {
     </header>
   );
 };
+
+

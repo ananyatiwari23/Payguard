@@ -26,6 +26,7 @@ try:
         BatchAnalysisResponse
     )
     from .analyzer import ScamDetectionEngine
+    from .auth import router as auth_router
 except ImportError:
     from models import (
         InvoiceRequest,
@@ -34,6 +35,7 @@ except ImportError:
         BatchAnalysisResponse
     )
     from analyzer import ScamDetectionEngine
+    from auth import router as auth_router
 
 app = FastAPI(
     title="AI-Powered Scam Detection Engine",
@@ -45,6 +47,8 @@ app = FastAPI(
     ),
     version="1.0.0"
 )
+
+app.include_router(auth_router)
 
 # Enable CORS for web and client integrations (configurable via CORS_ORIGINS)
 cors_origins_env = os.environ.get("CORS_ORIGINS", "*").strip()
@@ -73,7 +77,7 @@ def root_info():
         "service": "AI-Powered Scam Detection Engine",
         "version": "1.0.0",
         "docs_url": "/docs",
-        "supported_languages": ["en (English)", "hi (Hindi - हिंदी)", "mr (Marathi - मराठी)"],
+        "supported_languages": ["en (English)", "hi (Hindi - à¤¹à¤¿à¤‚à¤¦à¥€)", "mr (Marathi - à¤®à¤°à¤¾à¤ à¥€)"],
         "endpoints": {
             "analyze": "POST /api/v1/analyze",
             "batch_analyze": "POST /api/v1/analyze/batch",
@@ -114,14 +118,14 @@ def get_supported_languages():
             {
                 "code": "hi",
                 "name": "Hindi",
-                "native_name": "हिंदी",
-                "description": "स्वाभाविक हिंदी स्पष्टीकरण एवं सुरक्षा मार्गदर्शन (Devanagari)."
+                "native_name": "à¤¹à¤¿à¤‚à¤¦à¥€",
+                "description": "à¤¸à¥à¤µà¤¾à¤­à¤¾à¤µà¤¿à¤• à¤¹à¤¿à¤‚à¤¦à¥€ à¤¸à¥à¤ªà¤·à¥à¤Ÿà¥€à¤•à¤°à¤£ à¤à¤µà¤‚ à¤¸à¥à¤°à¤•à¥à¤·à¤¾ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ (Devanagari)."
             },
             {
                 "code": "mr",
                 "name": "Marathi",
-                "native_name": "मराठी",
-                "description": "नैसर्गिक मराठी स्पष्टीकरण आणि सुरक्षा सूचना (Devanagari)."
+                "native_name": "à¤®à¤°à¤¾à¤ à¥€",
+                "description": "à¤¨à¥ˆà¤¸à¤°à¥à¤—à¤¿à¤• à¤®à¤°à¤¾à¤ à¥€ à¤¸à¥à¤ªà¤·à¥à¤Ÿà¥€à¤•à¤°à¤£ à¤†à¤£à¤¿ à¤¸à¥à¤°à¤•à¥à¤·à¤¾ à¤¸à¥‚à¤šà¤¨à¤¾ (Devanagari)."
             }
         ]
     }
@@ -172,4 +176,3 @@ def batch_analyze_invoices(request: BatchAnalysisRequest):
         total_processed=len(results),
         high_risk_count=high_risk_count
     )
-
